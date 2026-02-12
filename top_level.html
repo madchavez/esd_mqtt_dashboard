@@ -1,0 +1,183 @@
+<!-- 
+Miguel Antonio D.Chavez
+migueladchavez@gmail.com
+https://github.com/madchavez
+
+Janella Marie G. Masongsong
+mjg1055@dlsud.edu.ph
+https://github.com/jnllmrmsngsng
+-->
+
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+	integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+
+<script src = "scripts/top_level.js"></script>
+
+<style>
+	@media only screen AND (min-width: 200px) {}
+</style>
+
+<script>device_list(); MQTTconnect();</script>
+
+<nav class="navbar navbar-dark flex-wrap p-0 shadow justify-content-between" style="background-color: #5672b3; min-height: 55px;">
+	<div style="width: 6rem;">
+	</div>
+	<div style="margin-left: 40px; margin-right: 40px;">
+		<div class="navbar-brand" style="font-size: 30px; font-family: Lucida Console;">ESD
+			MONITORING</div>
+	</div>
+	<div>
+		<input class="navbar-brand" type="submit" id="register" onclick="toggleRegister()" value="REGISTER"
+			style=" font-family: Arial; background-color: black; color:whitesmoke; height: 2rem; border-radius:10px; font-size: 15px; width: 6rem;"
+			tabindex="0" />
+	</div>
+</nav>
+
+
+
+<body style="background-color: #1e2631;">
+	<div id="intro" style="height: 100%-70px;">
+
+		<!-- devicelevel -->
+		<div class="container-fluid justify-content-center" id="register-box"
+			style="display: none; position: fixed; z-index: 500;">
+			<div class="row justify-content-end">
+				<div class="col-md-3  d-none d-md-block sidebar">
+					<div class="left-sidebar" style=" top:0; height: 40vh; background-color:#282f3c;">
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-sm-6 offset-sm-3 text-center">
+									<label
+										style="font-family: Georgia; font-size: 20px; color:whitesmoke; margin-top: 30px;">MAC
+										ADDRESS:</label>
+									<input type="text" class="form-control form-control-sm" id="macInput"
+										style="border-radius:10px; background-color: #F6F1F1;">
+								</div>
+							</div>
+						</div>
+
+
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-sm-6 offset-sm-3 text-center">
+									<label
+										style="font-family: Georgia; font-size: 20px; color:whitesmoke;">LINE:</label>
+									<input type="number" class="form-control form-control-sm" id="lineInput"
+										style="border-radius:10px; background-color: #F6F1F1;">
+								</div>
+							</div>
+						</div>
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-sm-8 offset-sm-2 text-center" style="margin-top: 10px;">
+									<button data-toggle="modal" data-target="#submitModal"
+										style="background-color: #485d97; color: whitesmoke; border-color: #485d97;"
+										id="submitBtn" onclick="reg_details('submitModalBody')">Submit</button>
+									<button data-toggle="modal" data-target="#updateModal"
+										style="background-color: #de974e; color: whitesmoke; border-color: #de974e;"
+										id="updateBtn" onclick="reg_details('updateModalBody')">Update</button>
+									<button data-toggle="modal" data-target="#deleteModal"
+										style="background-color:#df6e52; color: whitesmoke; border-color: #df6e52;"
+										id="deleteBtn" onclick="reg_details('deleteModalBody')">Delete</button>
+								</div>
+							</div>
+						</div>
+
+
+						<div style="text-align: center; visibility: visible; width: 100%; margin-top: 5px;" id="sAlert">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<main role="main" class="col-md-12  col-lg-12 px-4">
+			<div class="col-lg-12 d-flex">
+				<div class="row justify-content-center" id="sample" style="margin-top: 10px;">
+
+				</div>
+				<!-- MODAL FOR SUBMIT -->
+				<div class="modal fade" id="submitModal" tabindex="-1" role="dialog"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header" style="background-color: #5672b3;">
+								<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke;">Are you sure
+									you want to submit?</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body" id="submitModalBody">
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="button" class="btn" style="background-color: #485d97; color: whitesmoke;"
+									onclick="register_device()" data-dismiss="modal">Submit</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- MODAL FOR UPDATE-->
+				<div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header" style="background-color: #5672b3;">
+								<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke;">Are you sure
+									you want to update?</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body" id="updateModalBody">
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="button" class="btn" style="background-color: #de974e; color: whitesmoke;"
+									onclick="update_device()" data-dismiss="modal">Update</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- MODAL FORR DELETE-->
+				<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header" style="background-color: #5672b3;">
+								<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke;">Are you sure
+									you want to delete?</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body" id="deleteModalBody">
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="button" class="btn" style="background-color: #df6e52; color: whitesmoke;"
+									onclick="delete_device()" data-dismiss="modal">Delete</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+</body>
+</html>

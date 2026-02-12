@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!-- 
+Miguel Antonio D.Chavez
+migueladchavez@gmail.com
+https://github.com/madchavez
+
+Janella Marie G. Masongsong
+mjg1055@dlsud.edu.ph
+https://github.com/jnllmrmsngsng
+-->
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script src="scripts/device_level.js"></script>
+    <script src="scripts/device_level_charts.js"></script>
+
+    <style>
+        @media only screen and (min-width: 350px) {}
+
+        /*		?@media only screen (min-width: 1080px){}*/
+    </style>
+</head>
+
+<body style="background-color: #1e2631;">
+    <script>MQTTconnect(); search_device_registry();</script>
+    <nav class="navbar navbar-dark p-0 shadow d-flex flex-wrap justify-content-between align-middle"
+        style="background-color: #5672b3; min-height: 50px;">
+        <div>
+            <a class="navbar-brand" href="top_level.html"
+                style="font-size: 25px; font-family: Lucida Console; font-weight: bold; padding-left: 10px; color:whitesmoke;">Dashboard</a>
+        </div>
+        <div>
+            <button type="button" class="btn" data-toggle="modal" data-target="#additionalMetrics"
+                style="font-size: 25px; color: whitesmoke; text-decoration: underline; padding-right: 10px;">
+                Additional Metrics
+            </button>
+        </div>
+    </nav>
+    <main>
+        <!-- <div class="row no-gutters justify-content-start" style="height: 30px; margin-top:15px;background-color: #282f3c;">
+            
+            <div></div>
+        </div> -->
+        <!-- PORT REGISTRATION MODAL -->
+        <div class="modal fade" id="registerPortModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #5672b3; color: whitesmoke;">
+                        <h5 class="modal-title" id="exampleModalLabel">REGISTER PORT</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Port Number:</p>
+                        <input type="number" id="port"></input>
+                        <p style="padding-top: 15px; font-family: Arial;">Assigned Machine or Station:</p>
+                        <input type="text" id="assignment"></input>
+                    </div>
+                    <div class="modal-footer">
+                        <p id="registerModalNotice"></p>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="register_port()"
+                            style="background-color: #485d97; border-color:#485d97;">Register Port</button>
+                        <button type="button" class="btn btn-primary" onclick="clear_port()"
+                            style="background-color: #df6e52; border-color:#df6e52;">Clear Port</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Additional Metrics Modal -->
+        <div class="modal fade" id="additionalMetrics" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #5672b3; color: whitesmoke;">
+                        <h5 class="modal-title" id="exampleModalLabel">ADDITIONAL METRICS (WORK IN PROGRESS)</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h1>WORK IN PROGRESS</h1>
+                    </div>
+                    <div class="modal-footer">
+                        <p id="registerModalNotice"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sensor and Port Readings -->
+        <div class="row no-gutters" style="justify-content: space-between; margin: 10px;">
+            <div class="col-sm-8 col-md-6 d-flex flex-wrap" style="display:inline-block;">
+                <div class="card">
+                    <div class="card-header justify-content-between d-flex" style="min-height: 20px; background-color: #282f3c; border-color: whitesmoke;">
+                        <div>
+                            <button type="button" class="btn" data-toggle="modal"
+                                data-target="#registerPortModal"
+                                style="font-size: 15px; color: whitesmoke; padding-top: 0px; padding-bottom: 0px; background-color: #5672b3;">
+                                REGISTER PORT
+                            </button>
+                        </div>
+                        <div style="font-size: 20px; font-family: Lucida Console;color:whitesmoke;">LINE: <b
+                            name="lineLabel" id="line">[LINE]</b>
+                        </div>
+                        <div style="font-size: 20px; font-family: Lucida Console;color:whitesmoke;">ESD
+                            COUNT:
+                            <b name="esdc" id="esd_count"></b>
+                        </div>
+                    </div>
+                    <div class="card-body" style="background-color: #282f3c; min-height: 240px ">
+                        <div style="font-size: 20px; color:whitesmoke; font-weight: bold; width: 100%;">
+                            <div class="row justify-content-center">
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray;  font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port1" id="port1_state">1</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port2" id="port2_state">2</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port3" id="port3_state">3</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port4" id="port4_state">4</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port5" id="port5_state">5</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port6" id="port6_state">6</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port7" id="port7_state">7</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port8" id="port8_state">8</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port9" id="port9_state">9</button>
+                                <button
+                                    style="width: 130px; height: 100px; border-radius: 6px; background-color: lightgray; font-size: 20px; font-family: Arial; font-weight: bold;color: whitesmoke; word-wrap: break-word;"
+                                    name="port10" id="port10_state">10</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3" style="max-width: 20rem;">
+                <div class="card">
+                    <div class="card-body" style="height: 300px; background-color:#282f3c;">
+                        <h5 class="card-title" style="color: whitesmoke; font-size:25px;">Ambient Temperature</h5>
+                        <div class="d-flex justify-content-start">
+                            <i class="bi-thermometer-sun"
+                                style="font-size: 30px; padding-right: 15px; color: #df6e53;"></i>
+                            <p class="display-1 degree" style="color: whitesmoke; font-size: 25px;" name="atemp"
+                                id="atemp"></p>
+                        </div>
+                        <h5 class="card-title" style="color: whitesmoke; font-size:25px;">Internal Temperature</h5>
+                        <div class="d-flex justify-content-start">
+                            <i class="bi-thermometer-sun"
+                                style="font-size: 30px; padding-right: 15px; color: #e49a4e;"></i>
+                            <p class="display-1 degree" style="color: whitesmoke;font-size: 25px;" name="inttemp"
+                                id="temp"></p>
+                        </div>
+                        <h5 class="card-title" style="color: whitesmoke; font-size:25px;">Humidity</h5>
+                        <div class="d-flex justify-content-start">
+                            <i class="bi bi-moisture"
+                                style="font-size: 30px; padding-right: 15px; color: lightblue;"></i>
+                            <p class="display-1 degree" style="color: whitesmoke; font-size: 25px;" name="hum" id="hum">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3" style="max-width: 20rem;">
+                <div class="card">
+                    <div class="card-body" style="height: 300px; background-color:#282f3c;">
+                        <div style="height:25px">
+                            <h5 class="card-title" style="color: whitesmoke; font-size:25px;" id="mac">[MAC Address]
+                            </h5>
+                        </div>
+                        <hr style="color: white;">
+                        <h5 class="card-title" style="color: whitesmoke; font-size:30px;">
+                            <i class="bi bi-stopwatch"
+                                style="font-size: 30px; padding-right: 15px;color:#e1994e;"></i>Last Update
+                        </h5>
+                        <div class="d-flex justify-content-between" style="padding-top: 10px;">
+                            <p style="color: whitesmoke; font-size: 30px;" name="lastTime" id="lastTime"></p>
+                        </div>
+                        <div>
+                            <p style="color: whitesmoke; padding-top: 10px; font-size: 15px;" id="curTime">
+                                Current Time: </p>
+                            <script>var run = setInterval("refreshTime()", 100);</script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row no-gutters" style="justify-content: space-around; min-height: 350px;margin: 10px;">
+            <!-- 24 HOUR ESD COUNT GRAPH -->
+            <div class="col-sm-8 col-md-4" style="display:inline-block;">
+                <div class="card">
+                    <div class="card-header d-flex flex-wrap justify-content-between"
+                        style="background-color: #5672b3; height: 40px;font-size: 20px; color:whitesmoke; padding-top: 3px; padding-left: 10px;">
+                        <div style="font-size: 20px; color:whitesmoke; height: 100%">ESD COUNT</div>
+                        <div>
+                            <button type="button" class="btn" onclick="day_data_button()"
+                                style="font-size: 15px; color: whitesmoke; padding-top: 0px; padding-bottom: 0px; background-color: #282f3c;">24
+                                Hours</button>
+                            <button type="button" class="btn" onclick="half_day_data_button()"
+                                style="font-size: 15px; color: whitesmoke; padding-top: 0px; padding-bottom: 0px; background-color: #282f3c;">12
+                                Hours</button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="height: 320px;background-color: #282f3c;">
+                        <div id="chart">
+                            <script>var chart = new ApexCharts(document.querySelector("#chart"), options); day_data(device_topic);</script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 24 HOUR ESD DURATION -->
+            <div class="col-sm-8 col-md-7" style="display:inline-block;">
+                <div class="card">
+                    <div class="card-header d-flex flex-wrap justify-content-between"
+                        style="background-color: #5672b3; height: 40px;font-size: 20px; color:whitesmoke; padding-top: 3px; padding-left: 10px;">
+                        Time Spent Ungrounded (Last 24 Hours)
+                    </div>
+                    <div class="card-body" style="height: 320px;background-color: #282f3c;" id="chart1">
+                        <script>var chart1 = new ApexCharts(document.querySelector("#chart1"), options1); duration_data(device_topic);</script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
