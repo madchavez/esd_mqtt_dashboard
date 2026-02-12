@@ -1,12 +1,4 @@
-# esd_monitoring_dashboard
-
-PLEASE ADD: USER AUTHENTICATION
-MORE METRICS
-
-PLEASE IMPROVE: LOAD TIMES
-
-ONGOING IoT PROJECT
-
+# esd_mqtt_dashboard
 An ESP32-based device sends JSON payloads through MQTT protocol.
 
 The payload looks something like: 
